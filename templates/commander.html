@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Commander {{ produit.nom }} - Wa Ngoie{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-3 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img src="{{ url_for('static', filename=produit.image) }}" class="img-fluid h-100 object-fit-cover w-100" alt="{{ produit.nom }}">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body p-4">
+                            <h2 class="card-title text-warning fw-bold mb-2">{{ produit.nom }}</h2>
+                            <p class="card-text text-muted mb-3">{{ produit.description }}</p>
+                            <h4 class="text-danger fw-bold mb-4">{{ produit.prix }} FC</h4>
+
+                            <form method="POST" action="{{ url_for('commande.commander', product_id=produit.id) }}">
+                                <div class="mb-3">
+                                    <label for="quantite" class="form-label fw-bold">Quantité</label>
+                                    <input type="number" class="form-control" id="quantite" name="quantite" value="1" min="1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telephone" class="form-label fw-bold">Numéro de téléphone</label>
+                                    <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Ex: 0812345678" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adresse" class="form-label fw-bold">Adresse de livraison (ou 'Sur place')</label>
+                                    <input type="text" class="form-control" id="adresse" name="adresse" value="Sur place" required>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100 py-2 fw-bold text-uppercase fs-5">
+                                    <i class="fas fa-check-circle me-2"></i> Confirmer la commande
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

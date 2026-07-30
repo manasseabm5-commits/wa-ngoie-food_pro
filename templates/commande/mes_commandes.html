@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Commandes - Wa Ngoie{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-history text-warning me-2"></i>Historique de mes Commandes</h2>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Code Reçu</th>
+                            <th>Date</th>
+                            <th>Adresse</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th class="text-center">Action / Reçu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cmd in commandes %}
+                        <tr>
+                            <td class="fw-bold text-warning">{{ cmd.code_recu }}</td>
+                            <td>{{ cmd.created_at.strftime('%d/%m/%Y %H:%M') if cmd.created_at else 'Récemment' }}</td>
+                            <td>{{ cmd.adresse_livraison }}</td>
+                            <td class="fw-bold text-danger">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</td>
+                            <td>
+                                {% if cmd.status == 'En attente' %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% elif cmd.status == 'Validée' %}
+                                    <span class="badge bg-info text-dark">Validée</span>
+                                {% elif cmd.status == 'Livrée' %}
+                                    <span class="badge bg-success">Livrée</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ cmd.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if cmd.status in ['Validée', 'Livrée'] %}
+                                    <a href="{{ url_for('commande.telecharger_recu', order_id=cmd.id) }}" target="_blank" class="btn btn-sm btn-danger fw-bold shadow-sm">
+                                        <i class="fas fa-file-pdf me-1"></i> Imprimer Reçu
+                                    </a>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border py-2 px-3" title="Attendez que l'admin valide votre commande">
+                                        <i class="fas fa-lock me-1"></i> En attente de validation
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Vous n'avez passé aucune commande pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4 p-5 text-center">
+                <div class="mb-4">
+                    <i class="fa-solid fa-circle-check fa-4x text-success mb-3"></i>
+                    <h2 class="fw-bold text-dark">Commande Validée !</h2>
+                    <p class="text-muted">Merci pour votre commande chez Wa Ngoie. Votre reçu officiel est prêt.</p>
+                </div>
+
+                <div class="card bg-light border-0 rounded-4 p-4 text-start mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger fs-6 px-3 py-2">N° : {{ order.numero_commande }}</span>
+                        <span class="badge bg-success">Statut : {{ order.statut }}</span>
+                    </div>
+
+                    <ul class="list-group list-group-flush mb-3 bg-transparent">
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0">
+                            <span class="text-muted">Type de commande :</span> <strong>{{ order.type_commande }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0">
+                            <span class="text-muted">Adresse / Lieu :</span> <strong>{{ order.adresse_livraison }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0">
+                            <span class="text-muted">Téléphone :</span> <strong>{{ order.telephone_livraison }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-transparent px-0">
+                            <span class="text-muted">Date :</span> <small>{{ order.date_commande.strftime('%d/%m/%Y à %H:%M') }}</small>
+                        </li>
+                    </ul>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-basket-shopping text-warning"></i> Articles commandés :</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Article</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix Unitaire</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td>
+                                        {% if item.product and item.product.nom %}
+                                            {{ item.product.nom }}
+                                        {% elif item.produit and item.produit.nom %}
+                                            {{ item.produit.nom }}
+                                        {% else %}
+                                            Article
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">{{ item.quantite }}</td>
+                                    <td class="text-end">{{ "{:,.0f}".format(item.prix_unitaire) }} FC</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <h5 class="fw-bold mb-0">Montant Total :</h5>
+                        <h5 class="fw-bold text-danger mb-0">{{ "{:,.0f}".format(order.montant_total) }} FC</h5>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{{ url_for('commande.recu_pdf', numero=order.numero_commande) }}" class="btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm">
+                        <i class="fa-solid fa-file-pdf text-danger me-2"></i> Télécharger le Reçu PDF
+                    </a>
+                    <a href="{{ url_for('commande.mes_commandes') }}" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold">
+                        <i class="fa-solid fa-clock-rotate-left me-2"></i> Mes Commandes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
