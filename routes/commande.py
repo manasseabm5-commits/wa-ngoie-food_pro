@@ -56,7 +56,7 @@ def commander(product_id):
             flash("Une erreur s'est produite lors de la commande.", "danger")
             return redirect(url_for('menu.menu'))
 
-    return render_template('commande/commander.html', produit=produit)
+    return render_template('commander.html', produit=produit)
 
 
 # 2. HISTORIQUE DES COMMANDES CLIENT
@@ -64,7 +64,7 @@ def commander(product_id):
 @login_required
 def mes_commandes():
     commandes = Order.query.filter_by(user_id=current_user.id).order_by(Order.id.desc()).all()
-    return render_template('commande/mes_commandes.html', commandes=commandes)
+    return render_template('mes_commandes.html', commandes=commandes)
 
 
 # 3. GÉNÉRATION ET TÉLÉCHARGEMENT DU REÇU PDF
