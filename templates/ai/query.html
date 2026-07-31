@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}ABM AI - Assistant Wa-Ngoie{% endblock %}
+
+{% block content %}
+<div class="ai-container">
+    <div class="ai-card">
+
+        <!-- HEADER -->
+        <div class="ai-header">
+            <div class="ai-header-info">
+                <div class="ai-avatar">🤖</div>
+                <div>
+                    <h5>ABM AI</h5>
+                    <span>Assistant intelligent Wa-Ngoie</span>
+                </div>
+            </div>
+            <div class="ai-status">
+                <span class="status-dot"></span>
+                <small>Local</small>
+            </div>
+        </div>
+
+        <!-- CHAT WINDOW -->
+        <div id="chat" class="chat-window">
+            <div class="message ai-message">
+                <div class="bubble">
+                    👋 Bonjour, je suis <strong>ABM AI</strong>.
+                    <br><br>
+                    Je peux vous aider avec :
+                    <div class="ai-bullet-list">
+                        <span>🍔 Le menu</span>
+                        <span>🛒 Les commandes</span>
+                        <span>📄 Les reçus</span>
+                        <span>⚙️ La gestion Wa-Ngoie</span>
+                    </div>
+                </div>
+                <small class="message-time">ABM AI</small>
+            </div>
+        </div>
+
+        <!-- INPUT FOOTER -->
+        <div class="ai-footer">
+            <form id="chat-form">
+                <input 
+                    id="message-input"
+                    name="message"
+                    type="text"
+                    placeholder="Écrivez à ABM AI..."
+                    autocomplete="off"
+                    required>
+                <button id="send-btn" type="submit" aria-label="Envoyer">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- TEMPLATES -->
+<template id="tpl-user">
+    <div class="message user-message">
+        <div class="bubble">{TEXT}</div>
+        <small class="message-time">Vous</small>
+    </div>
+</template>
+
+<template id="tpl-ai">
+    <div class="message ai-message">
+        <div class="bubble">{TEXT}</div>
+        <small class="message-time">ABM AI</small>
+    </div>
+</template>
+{% endblock %}

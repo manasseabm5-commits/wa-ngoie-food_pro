@@ -11,6 +11,8 @@
         .navbar-dark-custom { background-color: #1a1a1a; }
         .card-img-top-fixed { height: 200px; object-fit: cover; }
     </style>
+    <!-- Styles spécifiques pour l'assistant ABM AI (local, responsive, thème Wa-Ngoie) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ai.css') }}">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-dark-custom py-3 shadow-sm">
@@ -29,6 +31,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white me-3" href="{{ url_for('menu.menu') }}"><i class="fas fa-utensils me-1"></i> Menu</a>
+                    </li>
+
+                    <!-- Lien vers l'assistant ABM AI (accessible à tous ; réponses adaptées selon rôle) -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white me-3" href="{{ url_for('ai.query') }}"><i class="fas fa-robot me-1"></i> ABM AI</a>
                     </li>
 
                     {% if current_user.is_authenticated %}
@@ -82,5 +89,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script de l'assistant ABM AI (local) -->
+    <script src="{{ url_for('static', filename='js/ai.js') }}"></script>
 </body>
 </html>

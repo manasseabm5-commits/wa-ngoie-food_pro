@@ -1,32 +1,249 @@
 {% extends 'base.html' %}
 
-{% block title %}Notre Menu - Wa Ngoie{% endblock %}
+{% block title %}Menu - Wa Ngoie Fast-Food{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold text-dark"><i class="fas fa-utensils text-warning me-2"></i>Notre Menu</h1>
-        <p class="text-muted fs-5">Découvrez les délices de Wa Ngoie et commandez en un clic !</p>
-    </div>
+<style>
+    :root {
+        --wa-gold: #F59E0B;
+        --wa-dark: #0B0F19;
+    }
 
-    <div class="row g-4">
-        {% for produit in produits %}
-        <div class="col-md-4 col-sm-6">
-            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-                <img src="{{ url_for('static', filename=produit.image) }}" class="card-img-top card-img-top-fixed" alt="{{ produit.nom }}">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title fw-bold">{{ produit.nom }}</h5>
-                    <p class="card-text text-muted flex-grow-1">{{ produit.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="fw-bold fs-5 text-danger">{{ produit.prix }} FC</span>
-                        <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn btn-warning fw-bold">
-                            <i class="fas fa-shopping-basket me-1"></i> Commander
-                        </a>
+    /* --- SECTION MENU STYLE TV BOARD & BRIQUES --- */
+    .menu-tv-section {
+        position: relative;
+        min-height: 90vh;
+        background: radial-gradient(circle at center, rgba(20, 24, 33, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%),
+                    url("{{ url_for('static', filename='images/hero_bg.png') }}") no-repeat center center;
+        background-size: cover;
+        padding: 3rem 0.5rem;
+        color: #ffffff;
+    }
+
+    /* Le cadre "TV Board" central */
+    .tv-board-frame {
+        background: #111827;
+        border: 3px solid #1F2937;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.15);
+        overflow: hidden;
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* En-tête du Board */
+    .tv-board-header {
+        background: #0f172a;
+        border-bottom: 2px solid #1F2937;
+        padding: 1.5rem 1rem;
+        text-align: center;
+    }
+
+    /* Grille style colonnes TV responsive */
+    .tv-columns-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(240px, 1fr));
+        gap: 0;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Chaque colonne du menu */
+    .tv-column {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1.8rem 1.2rem;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        position: relative;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        scroll-snap-align: start;
+        min-width: 250px;
+    }
+
+    .tv-column:last-child {
+        border-right: none;
+    }
+
+    /* Alternance des blocs bicolores */
+    .tv-column:nth-child(odd) {
+        background-color: #DC2626;
+        color: #ffffff;
+    }
+
+    .tv-column:nth-child(even) {
+        background-color: #F8FAFC;
+        color: #1E293B;
+    }
+
+    /* Typographie des titres */
+    .tv-item-title {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 1.25rem;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    .tv-column:nth-child(odd) .tv-item-title { color: #ffffff; }
+    .tv-column:nth-child(even) .tv-item-title { color: #0F172A; }
+
+    /* Prix */
+    .tv-item-price {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 800;
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .tv-column:nth-child(odd) .tv-item-price { color: #FDE047; }
+    .tv-column:nth-child(even) .tv-item-price { color: #DC2626; }
+
+    /* Image du produit */
+    .tv-item-img-wrapper {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0.8rem 0;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        background: #000;
+    }
+
+    .tv-item-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Description */
+    .tv-item-desc {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        opacity: 0.9;
+        margin-bottom: 1.2rem;
+        flex-grow: 1;
+    }
+
+    /* Bouton de commande */
+    .btn-tv-order {
+        display: block;
+        width: 100%;
+        padding: 0.7rem;
+        border-radius: 50px;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .tv-column:nth-child(odd) .btn-tv-order {
+        background-color: #111827;
+        color: #F59E0B;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .tv-column:nth-child(even) .btn-tv-order {
+        background-color: #DC2626;
+        color: #ffffff;
+    }
+
+    /* --- ADAPTATION MOBILE STRICTE --- */
+    @media (max-width: 992px) {
+        .menu-tv-section {
+            padding: 1.5rem 0.2rem;
+        }
+        .tv-board-frame {
+            border-radius: 10px;
+            border-width: 2px;
+        }
+        .tv-board-header {
+            padding: 1rem 0.5rem;
+        }
+        .tv-board-header h1 {
+            font-size: 1.35rem !important;
+        }
+        .tv-columns-grid {
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 15px;
+            padding: 1rem;
+        }
+        .tv-column {
+            border-radius: 12px;
+            border-right: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    }
+
+    .cbfw-signature {
+        font-family: 'Courier New', Courier, monospace;
+        letter-spacing: 1px;
+        opacity: 0.85;
+    }
+</style>
+
+<!-- ================= SECTION MENU TV BOARD ================= -->
+<section class="menu-tv-section">
+    <div class="container-fluid px-1 px-md-4">
+        
+        <div class="tv-board-frame">
+            
+            <div class="tv-board-header">
+                <span class="text-uppercase fw-bold text-warning small d-block mb-1" style="letter-spacing: 2px;">
+                    Wa Ngoie Live Menu Board
+                </span>
+                <h1 class="fw-bolder text-white mb-0" style="letter-spacing: 1px;">
+                    NOS SPÉCIALITÉS DU JOUR
+                </h1>
+            </div>
+
+            <!-- Grille des colonnes -->
+            <div class="tv-columns-grid">
+                {% for produit in produits %}
+                <div class="tv-column">
+                    <div>
+                        <h3 class="tv-item-title">{{ produit.nom }}</h3>
+                        <div class="tv-item-price">
+                            {{ produit.prix }} <small style="font-size: 0.7em;">FC</small>
+                        </div>
+                    </div>
+
+                    <div class="tv-item-img-wrapper">
+                        <img src="{{ url_for('static', filename=produit.image) }}" alt="{{ produit.nom }}" loading="lazy">
+                    </div>
+
+                    <p class="tv-item-desc">
+                        {{ produit.description }}
+                    </p>
+
+                    <!-- Affichage du bouton de commande uniquement si l'utilisateur n'est PAS admin -->
+                    <div>
+                        {% if not current_user.is_authenticated or not current_user.is_admin %}
+                            <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn-tv-order shadow-sm">
+                                Commander
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
+                {% endfor %}
             </div>
+
         </div>
-        {% endfor %}
+
+    </div>
+</section>
+
+<!-- ================= SIGNATURE CBFW ================= -->
+<div class="bg-dark text-center py-3 border-top border-secondary border-opacity-25">
+    <div class="container">
+        <p class="mb-0 small text-light cbfw-signature">
+            <span class="text-warning">⚡</span> that shit been doin' by <strong class="text-warning">cbfw</strong>
+        </p>
     </div>
 </div>
 {% endblock %}

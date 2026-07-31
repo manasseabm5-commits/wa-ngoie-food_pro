@@ -1,39 +1,349 @@
 {% extends 'base.html' %}
 
-{% block title %}Accueil - Wa Ngoie Fast-Food{% endblock %}
+{% block title %}Accueil - Wa Ngoie Fast-Food | Le Goût de Kintambo{% endblock %}
 
 {% block content %}
-<div class="position-relative text-white text-center py-5 shadow-lg overflow-hidden bg-dark" style="min-height: 400px;">
-    <img src="{{ url_for('static', filename='images/hero_bg.png') }}" alt="Fond Wa Ngoie" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
-    <div class="container py-5 position-relative" style="z-index: 2;">
-        <h1 class="display-3 fw-bold text-warning mb-3">Bienvenue chez Wa Ngoie</h1>
-        <p class="lead fs-4 mb-4">Le goût authentique du meilleur fast-food de Kintambo. Commandez en ligne, récupérez sur place ou faites-vous livrer !</p>
-        <a href="{{ url_for('menu.menu') }}" class="btn btn-warning btn-lg fw-bold px-4 py-3 shadow text-dark text-uppercase">
-            <i class="fas fa-shopping-cart me-2"></i> Commander Maintenant
-        </a>
-    </div>
-</div>
+<style>
+    :root {
+        --wa-gold: #F59E0B;
+        --wa-gold-hover: #D97706;
+        --wa-dark: #0B0F19;
+        --wa-card-bg: #1F2937;
+    }
 
-<div class="container my-5">
-    <h2 class="text-center fw-bold text-dark mb-4">Plats en Vedette</h2>
-    <div class="row g-4">
-        {% for produit in produits %}
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-                <img src="{{ url_for('static', filename=produit.image) }}" class="card-img-top card-img-top-fixed" alt="{{ produit.nom }}">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title fw-bold">{{ produit.nom }}</h5>
-                    <p class="card-text text-muted flex-grow-1">{{ produit.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="fw-bold fs-5 text-danger">{{ produit.prix }} FC</span>
-                        <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn btn-warning fw-bold">
-                            <i class="fas fa-cart-plus me-1"></i> Commander
-                        </a>
+    .hero-editorial {
+        position: relative;
+        min-height: 85vh;
+        background-color: var(--wa-dark);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        color: #ffffff;
+    }
+
+    .hero-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.35;
+        filter: contrast(110%) saturate(120%);
+        z-index: 1;
+        transform: scale(1.02);
+        transition: transform 10s ease-out;
+    }
+
+    .hero-editorial:hover .hero-bg-img {
+        transform: scale(1.08);
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(11,15,25,0.85) 0%, rgba(11,15,25,0.75) 50%, rgba(11,15,25,0.9) 100%);
+        z-index: 2;
+    }
+
+    @media (min-width: 992px) {
+        .hero-overlay {
+            background: linear-gradient(90deg, rgba(11,15,25,0.92) 0%, rgba(11,15,25,0.75) 50%, rgba(11,15,25,0.4) 100%);
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+    }
+
+    .editorial-line {
+        width: 100px;
+        height: 2px;
+        background: var(--wa-gold);
+        margin: 1.5rem 0;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+
+    .side-indicator {
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .side-line {
+        width: 1px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .side-icon {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .side-icon:hover {
+        color: var(--wa-gold);
+        transform: scale(1.2);
+    }
+
+    .btn-editorial {
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid var(--wa-gold);
+        color: #ffffff;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .btn-editorial:hover {
+        background: var(--wa-gold);
+        color: #000000;
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+        transform: translateY(-2px);
+    }
+
+    #dynamic-hero-text {
+        transition: opacity 0.4s ease-in-out;
+        word-break: break-word;
+    }
+
+    .food-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 20px;
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s ease;
+        overflow: hidden;
+    }
+
+    .food-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 16 / 10;
+        background-color: #F3F4F6;
+    }
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .food-card:hover .card-img-wrapper img {
+        transform: scale(1.06);
+    }
+
+    .badge-flavor {
+        background: rgba(17, 24, 39, 0.85);
+        backdrop-filter: blur(6px);
+        color: #F59E0B;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .side-indicator {
+            display: none !important;
+        }
+        .hero-editorial {
+            min-height: 80vh;
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+        .display-3 {
+            font-size: 2.5rem !important;
+        }
+    }
+</style>
+
+<!-- ================= HERO CINÉMATOGRAPHIQUE ================= -->
+<section class="hero-editorial py-5">
+    <img src="{{ url_for('static', filename='images/hero_bg.png') }}" alt="Fond Wa Ngoie" class="hero-bg-img">
+    <div class="hero-overlay"></div>
+
+    <div class="side-indicator d-none d-md-flex">
+        <div class="side-line"></div>
+        <a href="#featured-menu" class="side-icon"><i class="fas fa-utensils"></i></a>
+        <a href="{{ url_for('menu.menu') }}" class="side-icon"><i class="fas fa-shopping-bag"></i></a>
+        <a href="#about-section" class="side-icon"><i class="fas fa-fire"></i></a>
+        <div class="side-line"></div>
+    </div>
+
+    <div class="container hero-content py-4 px-3 px-md-4">
+        <div class="row">
+            <div class="col-lg-8 col-xl-7 text-start">
+                
+                <span class="text-uppercase fw-bold small text-warning d-block mb-2" style="letter-spacing: 3px;">
+                    Kintambo, Kinshasa
+                </span>
+
+                <h1 class="display-3 fw-bolder mb-0 lh-sm text-white">
+                    Bienvenue<br>
+                    <span style="color: var(--wa-gold);">chez Wa Ngoie</span>
+                </h1>
+
+                <div class="editorial-line"></div>
+
+                <!-- Texte dynamique rotatif (10 messages + 11e signature) -->
+                <p id="dynamic-hero-text" class="lead text-light opacity-75 mb-4 pe-lg-5 fs-6 fs-md-5" style="max-width: 580px; line-height: 1.6; min-height: 75px;">
+                    Le goût authentique du meilleur fast-food de Kintambo.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-3 pt-2">
+                    <a href="{{ url_for('menu.menu') }}" class="btn-editorial text-center">
+                        Commander Maintenant
+                    </a>
+                    <a href="#featured-menu" class="btn btn-link text-white text-decoration-none fw-semibold small text-uppercase text-center text-sm-start mt-2 mt-sm-0" style="letter-spacing: 1px;">
+                        Explorer le menu
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SCRIPT DE ROTATION DES TEXTES ================= -->
+<script>
+    const messages = [
+        "Le goût authentique du meilleur fast-food de Kintambo.",
+        "Des recettes préparées avec passion pour une expérience inoubliable.",
+        "Commandez en ligne, récupérez sur place ou faites-vous livrer.",
+        "Des ingrédients frais sélectionnés rigoureusement chaque jour.",
+        "Un service rapide et soigné pour satisfaire toutes vos faims.",
+        "La référence incontournable de la gastronomie rapide à Kinshasa.",
+        "Des portions généreuses et des saveurs qui marquent les esprits.",
+        "Une cuisine propre, professionnelle et résolument moderne.",
+        "Passez commande en quelques clics depuis votre appareil.",
+        "Le savoir-faire et l'exigence au service de votre appétit.",
+        "that shit been doin' by cbfw"
+    ];
+
+    let currentIndex = 0;
+    const textElement = document.getElementById("dynamic-hero-text");
+
+    setInterval(() => {
+        textElement.style.opacity = 0;
+        setTimeout(() => {
+            currentIndex = (currentIndex + 1) % messages.length;
+            textElement.textContent = messages[currentIndex];
+            
+            if (currentIndex === 10) {
+                textElement.style.color = "#F59E0B";
+                textElement.style.fontFamily = "'Courier New', Courier, monospace";
+                textElement.style.fontWeight = "bold";
+            } else {
+                textElement.style.color = "";
+                textElement.style.fontFamily = "";
+                textElement.style.fontWeight = "";
+            }
+
+            textElement.style.opacity = 1;
+        }, 300);
+    }, 3000);
+</script>
+
+<!-- ================= SECTION PLATS EN VEDETTE ================= -->
+<section id="featured-menu" class="py-5 bg-light">
+    <div class="container py-4 px-3 px-md-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 text-center text-md-start">
+            <div>
+                <span class="text-uppercase fw-bold small text-warning d-block mb-1" style="letter-spacing: 2px;">
+                    Sélection du Chef
+                </span>
+                <h2 class="fw-bolder text-dark display-6 mb-0">Nos Plats en Vedette</h2>
+            </div>
+            <a href="{{ url_for('menu.menu') }}" class="btn btn-dark rounded-pill px-4 py-2 mt-3 mt-md-0 fw-semibold">
+                Tout le menu
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for produit in produits %}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card food-card h-100 shadow-sm d-flex flex-column">
+                    <div class="card-img-wrapper">
+                        <img src="{{ url_for('static', filename=produit.image) }}" alt="{{ produit.nom }}" loading="lazy">
+                        <span class="position-absolute top-0 end-0 m-3 badge badge-flavor px-3 py-2 rounded-pill">
+                            Populaire
+                        </span>
+                    </div>
+
+                    <div class="card-body d-flex flex-column p-4">
+                        <h5 class="card-title fw-bold text-dark fs-5 mb-2">{{ produit.nom }}</h5>
+                        <p class="card-text text-muted small flex-grow-1 mb-4" style="line-height: 1.6;">
+                            {{ produit.description }}
+                        </p>
+
+                        <div class="pt-3 border-top d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <span class="d-block small text-muted" style="font-size: 0.75rem;">Prix unitaire</span>
+                                <span class="fw-bolder fs-5 text-dark">
+                                    {{ produit.prix }} <small class="text-warning fw-bold">FC</small>
+                                </span>
+                            </div>
+
+                            <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn btn-warning fw-bold px-4 py-2 rounded-pill text-dark d-inline-flex align-items-center shadow-sm">
+                                <span>Commander</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
+</section>
+
+<!-- ================= SECTION RÉASSURANCE ================= -->
+<section id="about-section" class="py-5 bg-white border-top">
+    <div class="container py-3 px-3 px-md-4">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <h5 class="fw-bold">Service Éclair</h5>
+                    <p class="text-muted small mb-0">Vos commandes sont préparées instantanément dès validation.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <h5 class="fw-bold">Saveur Inimitable</h5>
+                    <p class="text-muted small mb-0">Des recettes exclusives qui font la réputation de Wa Ngoie à Kinshasa.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <h5 class="fw-bold">Livraison Rapide</h5>
+                    <p class="text-muted small mb-0">Expédition directe et sécurisée chez vous ou à votre bureau.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from flask import Flask
 from config import Config
 from extensions import db, bcrypt, login_manager
@@ -29,12 +29,16 @@ def create_app(config_class=Config):
     from routes.menu import menu_bp
     from routes.commande import commande_bp
     from routes.admin import admin_bp
+    # Blueprint de l'assistant ABM AI (local)
+    from routes.ai import ai_bp
     
     app.register_blueprint(home_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(menu_bp)
     app.register_blueprint(commande_bp)
     app.register_blueprint(admin_bp)
+    # Enregistrement du blueprint AI (URL : /ai)
+    app.register_blueprint(ai_bp)
 
     with app.app_context():
         db.create_all()
@@ -84,3 +88,6 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+
