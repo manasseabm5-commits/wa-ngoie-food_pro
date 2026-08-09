@@ -3,118 +3,302 @@
 {% block title %}Dashboard Administrateur - Wa Ngoie{% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container-fluid py-3 px-2 px-md-4">
     
-    <!-- TITRE & BOUTONS RAPPORTS PDF -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <!-- EN-TÊTE DU TABLEAU DE BORD -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-            <h2 class="fw-bold text-dark mb-0"><i class="fas fa-chart-line text-warning me-2"></i>Tableau de Bord Fast-Food</h2>
-            <small class="text-muted">Gestion des commandes et suivi des ventes</small>
+            <h2 class="fw-bold text-dark mb-1 fs-4 fs-md-3"><i class="fas fa-tachometer-alt text-warning me-2"></i>Espace Direction</h2>
+            <p class="text-muted small mb-0">Gestion en temps réel des flux, commandes et catalogue.</p>
         </div>
-        <div class="dropdown">
-            <button class="btn btn-danger dropdown-toggle fw-bold shadow-sm" type="button" id="pdfMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-file-pdf me-1"></i> Imprimer Rapport PDF
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pdfMenu">
-                <li><a class="dropdown-menu-item dropdown-item fw-bold text-danger" href="{{ url_for('admin.exporter_rapport', type='jour') }}" target="_blank"><i class="fas fa-clock me-2"></i> Rapport Journalier (par heure)</a></li>
-                <li><a class="dropdown-menu-item dropdown-item" href="{{ url_for('admin.exporter_rapport', type='mois') }}" target="_blank"><i class="fas fa-calendar-alt me-2"></i> Rapport Mensuel</a></li>
-                <li><a class="dropdown-menu-item dropdown-item" href="{{ url_for('admin.exporter_rapport', type='annee') }}" target="_blank"><i class="fas fa-calendar me-2"></i> Rapport Annuel</a></li>
-            </ul>
+        <div class="d-flex gap-2 flex-wrap w-100 w-md-auto">
+            <a href="{{ url_for('admin.ajouter_produit') }}" class="btn btn-warning fw-bold text-dark shadow-sm px-3 flex-grow-1 flex-md-grow-0">
+                <i class="fas fa-plus-circle me-1"></i> Nouveau Plat
+            </a>
+            <div class="dropdown flex-grow-1 flex-md-grow-0">
+                <button class="btn btn-danger dropdown-toggle fw-bold shadow-sm px-3 w-100" type="button" id="pdfMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-file-pdf me-1"></i> Rapports PDF
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="pdfMenu">
+                    <li><a class="dropdown-item fw-bold text-danger" href="{{ url_for('admin.exporter_rapport', type='jour') }}" target="_blank"><i class="fas fa-clock me-2"></i> Rapport Journalier</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('admin.exporter_rapport', type='mois') }}" target="_blank"><i class="fas fa-calendar-alt me-2"></i> Rapport Mensuel</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('admin.exporter_rapport', type='annee') }}" target="_blank"><i class="fas fa-calendar me-2"></i> Rapport Annuel</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- CARTES DE STATISTIQUES FINANCIÈRES -->
+    <!-- CARTES DE STATISTIQUES FINANCIÈRES EN TEMPS RÉEL -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-3">
+        <div class="col-xl-3 col-sm-6">
+            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <span class="text-uppercase text-muted small fw-bold">Ventes du Jour</span>
-                        <h3 class="fw-bold text-warning mb-0 mt-1">{{ "{:,}".format(ventes_jour).replace(',', ' ') }} FC</h3>
+                        <h4 class="fw-bold text-warning mb-0 mt-1">{{ "{:,}".format(ventes_jour).replace(',', ' ') }} FC</h4>
                     </div>
-                    <i class="fas fa-coins fs-1 text-warning opacity-50"></i>
+                    <div class="p-3 bg-warning bg-opacity-10 rounded-circle text-warning fs-4">
+                        <i class="fas fa-coins"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-3">
+        <div class="col-xl-3 col-sm-6">
+            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-uppercase text-muted small fw-bold">Sur Place (Jour)</span>
+                        <h4 class="fw-bold text-info mb-0 mt-1">{{ "{:,}".format(ventes_sur_place).replace(',', ' ') }} FC <small class="fs-6 text-muted">({{ total_sur_place }})</small></h4>
+                    </div>
+                    <div class="p-3 bg-info bg-opacity-10 rounded-circle text-info fs-4">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <span class="text-uppercase text-muted small fw-bold">Ventes du Mois</span>
-                        <h3 class="fw-bold text-success mb-0 mt-1">{{ "{:,}".format(ventes_mois).replace(',', ' ') }} FC</h3>
+                        <h4 class="fw-bold text-success mb-0 mt-1">{{ "{:,}".format(ventes_mois).replace(',', ' ') }} FC</h4>
                     </div>
-                    <i class="fas fa-wallet fs-1 text-success opacity-50"></i>
+                    <div class="p-3 bg-success bg-opacity-10 rounded-circle text-success fs-4">
+                        <i class="fas fa-wallet"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-3">
+        <div class="col-xl-3 col-sm-6">
+            <div class="card border-0 bg-dark text-white p-3 shadow-sm rounded-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-uppercase text-muted small fw-bold">Commandes Validées</span>
-                        <h3 class="fw-bold text-info mb-0 mt-1">{{ total_validees }}</h3>
+                        <span class="text-uppercase text-muted small fw-bold">Validées</span>
+                        <h4 class="fw-bold text-primary mb-0 mt-1">{{ total_validees }}</h4>
                     </div>
-                    <i class="fas fa-check-circle fs-1 text-info opacity-50"></i>
+                    <div class="p-3 bg-primary bg-opacity-10 rounded-circle text-primary fs-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TABLEAU DES COMMANDES -->
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-header bg-dark text-white py-3">
-            <h5 class="mb-0 fw-bold"><i class="fas fa-list me-2"></i>Toutes les Commandes</h5>
+    <!-- SECTION COMMANDES : ADAPTÉE MOBILE & DESKTOP -->
+    <div class="card shadow-sm border-0 rounded-4 mb-5 overflow-hidden">
+        <div class="card-header bg-dark text-white py-3 px-3 px-md-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold fs-6 fs-md-5"><i class="fas fa-clipboard-list me-2"></i>Suivi des Commandes</h5>
+            <span class="badge bg-warning text-dark px-2 py-1 fw-bold" style="font-size: 0.75rem;">Temps Réel</span>
+        </div>
+        <div class="card-body p-0">
+            
+            {% if commandes %}
+                <!-- VUE MOBILE (Cartes empilées pour téléphones - Visible uniquement sur petit écran) -->
+                <div class="d-block d-lg-none p-3">
+                    <div class="row g-3">
+                        {% for cmd in commandes %}
+                        <div class="col-12">
+                            <div class="card border shadow-sm rounded-3 p-3 bg-light">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark">{{ cmd.code_recu }}</span>
+                                    <div>
+                                        {% if cmd.type_commande == 'Sur place' %}
+                                            <span class="badge bg-info text-dark" style="font-size: 0.65rem;"><i class="fas fa-chair me-1"></i>Sur place</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary" style="font-size: 0.65rem;"><i class="fas fa-motorcycle me-1"></i>En ligne</span>
+                                        {% endif %}
+                                        
+                                        {% if cmd.status == 'En attente' %}
+                                            <span class="badge bg-warning text-dark">En attente</span>
+                                        {% elif cmd.status == 'Validée' %}
+                                            <span class="badge bg-info text-dark">Validée</span>
+                                        {% elif cmd.status == 'Livrée' %}
+                                            <span class="badge bg-success">Livrée</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ cmd.status }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="small mb-2">
+                                    <div class="fw-bold text-dark"><i class="fas fa-user me-1 text-muted"></i>{{ cmd.client.nom if cmd.client else 'Client Comptoir' }}</div>
+                                    <div class="text-muted"><i class="fas fa-phone me-1"></i><a href="tel:{{ cmd.telephone }}" class="text-decoration-none fw-bold text-dark">{{ cmd.telephone }}</a></div>
+                                    <div class="text-muted text-truncate"><i class="fas fa-map-marker-alt me-1"></i>{{ cmd.adresse_livraison }}</div>
+                                    <div class="text-muted"><i class="fas fa-clock me-1"></i>{{ cmd.created_at.strftime('%d/%m/%Y %H:%M') if cmd.created_at else 'Récemment' }}</div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                    <span class="fw-bold text-danger fs-5">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</span>
+                                    
+                                    <!-- Formulaire de changement de statut mobile -->
+                                    <form method="POST" action="{{ url_for('admin.changer_statut', order_id=cmd.id) }}" class="d-flex gap-1">
+                                        <select name="statut" class="form-select form-select-sm" style="font-size: 0.75rem; width: 95px;">
+                                            <option value="En attente" {% if cmd.status == 'En attente' %}selected{% endif %}>En attente</option>
+                                            <option value="Validée" {% if cmd.status == 'Validée' %}selected{% endif %}>Validée</option>
+                                            <option value="Livrée" {% if cmd.status == 'Livrée' %}selected{% endif %}>Livrée</option>
+                                            <option value="Annulée" {% if cmd.status == 'Annulée' %}selected{% endif %}>Annulée</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-dark px-2"><i class="fas fa-sync-alt"></i></button>
+                                    </form>
+                                </div>
+
+                                <!-- Boutons Archiver / Supprimer sur Mobile -->
+                                <div class="d-flex gap-2 mt-2 pt-2 border-top">
+                                    <form action="{{ url_for('admin.supprimer_commande', order_id=cmd.id) }}" method="POST" class="w-150">
+                                        <button type="submit" name="action_suppression" value="garder_ca" class="btn btn-warning btn-sm w-100 fw-bold" style="font-size: 0.75rem;">
+                                            <i class="fas fa-archive me-1"></i> Archiver (Garder CA)
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('admin.supprimer_commande', order_id=cmd.id) }}" method="POST" class="w-50" onsubmit="return confirm('Attention : Cette action va effacer définitivement la commande et annuler son montant du Chiffre d\'Affaires. Continuer ?');">
+                                        <button type="submit" name="action_suppression" value="supprimer_tout" class="btn btn-danger btn-sm w-100 fw-bold" style="font-size: 0.75rem;">
+                                            <i class="fas fa-trash me-1"></i> Supprimer tout
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- VUE DESKTOP (Tableau classique complet - Visible uniquement sur grands écrans) -->
+                <div class="table-responsive d-none d-lg-block">
+                    <table class="table table-hover align-middle mb-0 text-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Code / Type</th>
+                                <th>Client</th>
+                                <th>Contact</th>
+                                <th>Adresse</th>
+                                <th>Total</th>
+                                <th>Date & Heure</th>
+                                <th>Statut Actuel</th>
+                                <th>Modifier Statut</th>
+                                <th class="text-end pe-4">Gestion Espace (CA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cmd in commandes %}
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="fw-bold text-dark d-block">{{ cmd.code_recu }}</span>
+                                    {% if cmd.type_commande == 'Sur place' %}
+                                        <span class="badge bg-info text-dark mt-1" style="font-size: 0.7rem;"><i class="fas fa-chair me-1"></i>Sur place</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary mt-1" style="font-size: 0.7rem;"><i class="fas fa-motorcycle me-1"></i>En ligne</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ cmd.client.nom if cmd.client else 'Client Comptoir' }}</div>
+                                    <div class="text-muted small"><i class="fas fa-envelope me-1"></i>{{ cmd.client.email if cmd.client and cmd.client.email else 'N/A' }}</div>
+                                </td>
+                                <td>
+                                    <a href="tel:{{ cmd.telephone }}" class="text-decoration-none text-dark fw-bold">
+                                        <i class="fas fa-phone-alt text-success me-1"></i>{{ cmd.telephone }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="text-muted text-wrap d-inline-block" style="max-width: 180px;">{{ cmd.adresse_livraison }}</span>
+                                </td>
+                                <td class="fw-bold text-danger">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</td>
+                                <td><small class="text-muted">{{ cmd.created_at.strftime('%d/%m/%Y %H:%M') if cmd.created_at else 'Récemment' }}</small></td>
+                                <td>
+                                    {% if cmd.status == 'En attente' %}
+                                        <span class="badge bg-warning text-dark px-2 py-1">En attente</span>
+                                    {% elif cmd.status == 'Validée' %}
+                                        <span class="badge bg-info text-dark px-2 py-1">Validée</span>
+                                    {% elif cmd.status == 'Livrée' %}
+                                        <span class="badge bg-success px-2 py-1">Livrée</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary px-2 py-1">{{ cmd.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('admin.changer_statut', order_id=cmd.id) }}" class="d-flex gap-1 align-items-center">
+                                        <select name="statut" class="form-select form-select-sm shadow-none" style="width: 110px;">
+                                            <option value="En attente" {% if cmd.status == 'En attente' %}selected{% endif %}>En attente</option>
+                                            <option value="Validée" {% if cmd.status == 'Validée' %}selected{% endif %}>Validée</option>
+                                            <option value="Livrée" {% if cmd.status == 'Livrée' %}selected{% endif %}>Livrée</option>
+                                            <option value="Annulée" {% if cmd.status == 'Annulée' %}selected{% endif %}>Annulée</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-dark px-2"><i class="fas fa-sync-alt"></i></button>
+                                    </form>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('admin.supprimer_commande', order_id=cmd.id) }}" method="POST" class="d-inline">
+                                        <!-- Bouton Archiver (Garde le CA, libère l'espace visuel) -->
+                                        <button type="submit" name="action_suppression" value="garder_ca" class="btn btn-sm btn-warning fw-bold text-dark" title="Masquer la commande mais conserver l'argent dans les stats">
+                                            <i class="fas fa-archive"></i> Archiver
+                                        </button>
+                                        <!-- Bouton Supprimer Totalement -->
+                                        <button type="submit" name="action_suppression" value="supprimer_tout" class="btn btn-sm btn-outline-danger" title="Supprimer définitivement et annuler le CA" onclick="return confirm('Attention : Cette action efface la commande et annule son montant du Chiffre d\'Affaires.');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-box-open fa-2x mb-2 text-black-50"></i>
+                    <p class="mb-0">Aucune commande active enregistrée pour le moment.</p>
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+
+    <!-- CATALOGUE DES PLATS (Responsive aussi) -->
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-secondary text-white py-3 px-3 px-md-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold fs-6 fs-md-5"><i class="fas fa-utensils me-2"></i>Catalogue des Plats</h5>
+            <a href="{{ url_for('admin.ajouter_produit') }}" class="btn btn-sm btn-light fw-bold text-dark px-3">
+                <i class="fas fa-plus me-1"></i> Nouveau
+            </a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-secondary">
+                    <thead class="table-light">
                         <tr>
-                            <th>Code Unique</th>
-                            <th>Client</th>
-                            <th>Téléphone</th>
-                            <th>Adresse</th>
-                            <th>Montant</th>
-                            <th>Date</th>
-                            <th>Statut Actuel</th>
-                            <th>Action</th>
+                            <th class="ps-4">Image</th>
+                            <th>Nom du Plat</th>
+                            <th class="d-none d-md-table-cell">Description</th>
+                            <th>Prix Unitaire</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for cmd in commandes %}
+                        {% for prod in produits %}
                         <tr>
-                            <td class="fw-bold text-warning">{{ cmd.code_recu }}</td>
-                            <td>{{ cmd.client.nom if cmd.client else 'Client' }}</td>
-                            <td>{{ cmd.telephone }}</td>
-                            <td>{{ cmd.adresse_livraison }}</td>
-                            <td class="fw-bold text-danger">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</td>
-                            <td>{{ cmd.created_at.strftime('%d/%m/%Y %H:%M') if cmd.created_at else 'Récemment' }}</td>
-                            <td>
-                                {% if cmd.status == 'En attente' %}
-                                    <span class="badge bg-warning text-dark">En attente</span>
-                                {% elif cmd.status == 'Validée' %}
-                                    <span class="badge bg-info text-dark">Validée</span>
-                                {% elif cmd.status == 'Livrée' %}
-                                    <span class="badge bg-success">Livrée</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ cmd.status }}</span>
-                                {% endif %}
+                            <td class="ps-4">
+                                <img src="{{ url_for('static', filename=prod.image) }}" alt="{{ prod.nom }}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://via.placeholder.com/45';">
                             </td>
-                            <td>
-                                <form method="POST" action="{{ url_for('admin.changer_statut', order_id=cmd.id) }}" class="d-flex gap-1">
-                                    <select name="statut" class="form-select form-select-sm" style="width: 120px;">
-                                        <option value="En attente" {% if cmd.status == 'En attente' %}selected{% endif %}>En attente</option>
-                                        <option value="Validée" {% if cmd.status == 'Validée' %}selected{% endif %}>Validée</option>
-                                        <option value="Livrée" {% if cmd.status == 'Livrée' %}selected{% endif %}>Livrée</option>
-                                        <option value="Annulée" {% if cmd.status == 'Annulée' %}selected{% endif %}>Annulée</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-dark">Mettre à jour</button>
+                            <td class="fw-bold text-dark">{{ prod.nom }}</td>
+                            <td class="text-muted small d-none d-md-table-cell">{{ prod.description[:50] }}...</td>
+                            <td class="fw-bold text-danger">{{ "{:,}".format(prod.prix).replace(',', ' ') }} FC</td>
+                            <td class="text-end pe-4">
+                                <a href="{{ url_for('admin.modifier_produit', product_id=prod.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-pen"></i> <span class="d-none d-sm-inline">Modifier</span>
+                                </a>
+                                <form action="{{ url_for('admin.supprimer_produit', product_id=prod.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous vraiment supprimer ce plat du menu ?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> <span class="d-none d-sm-inline">Supprimer</span>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">Aucune commande enregistrée.</td>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-hamburger fa-2x mb-2 text-black-50"></i>
+                                <p class="mb-0">Aucun plat enregistré dans le menu.</p>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -122,5 +306,6 @@
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

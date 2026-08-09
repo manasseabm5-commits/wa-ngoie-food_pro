@@ -13,7 +13,7 @@ def create_app(config_class=Config):
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message = "Veuillez vous connecter pour accéder à l'espace Wa Ngoie."
-    login_message_category = "warning"
+    login_manager.login_message_category = "warning"
 
     from models import User, Product, Order, OrderItem
     
@@ -29,7 +29,6 @@ def create_app(config_class=Config):
     from routes.menu import menu_bp
     from routes.commande import commande_bp
     from routes.admin import admin_bp
-    # Blueprint de l'assistant ABM AI (local)
     from routes.ai import ai_bp
     
     app.register_blueprint(home_bp)
@@ -37,7 +36,6 @@ def create_app(config_class=Config):
     app.register_blueprint(menu_bp)
     app.register_blueprint(commande_bp)
     app.register_blueprint(admin_bp)
-    # Enregistrement du blueprint AI (URL : /ai)
     app.register_blueprint(ai_bp)
 
     with app.app_context():
@@ -55,7 +53,7 @@ def create_app(config_class=Config):
             )
             db.session.add(admin)
             db.session.commit()
-            print("[INFO] Compte Administrateur crée avec succès (Identifiant: wangoie / Passe: wangoie2026).")
+            print("[INFO] Compte Administrateur créé avec succès (Identifiant: admin@wangoie.com / Passe: wangoie2026).")
 
         # 2. Injection des plats
         if Product.query.count() == 0:
@@ -86,8 +84,5 @@ def create_app(config_class=Config):
 
 app = create_app()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
-

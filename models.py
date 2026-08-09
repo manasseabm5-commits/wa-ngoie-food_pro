@@ -15,6 +15,7 @@ class Product(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Integer, nullable=False)
+    categorie = db.Column(db.String(50), nullable=False, default='Plat')
     image = db.Column(db.String(255), nullable=False, default='uploads/plats/default_food.jpg')
 
 class Order(db.Model):
@@ -22,14 +23,18 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total_price = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(50), default='En attente')
+    type_commande = db.Column(db.String(50), default='Livraison')  # 'Sur place' ou 'Livraison'
     adresse_livraison = db.Column(db.String(255), nullable=True, default='Sur place')
     telephone = db.Column(db.String(50), nullable=True, default='')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # --- LIGNE AJOUTÉE POUR GÉRER L'ARCHIVAGE (SOFT DELETE) ---
+    is_archived = db.Column(db.Boolean, default=False)
+    
     items = db.relationship('OrderItem', backref='order', lazy=True)
 
     @property
     def code_recu(self):
-        """Génère un code de reçu unique et lisible (ex: WN-2026-0002)"""
         annee = self.created_at.strftime('%Y') if self.created_at else '2026'
         return f"WN-{annee}-{self.id:04d}"
 

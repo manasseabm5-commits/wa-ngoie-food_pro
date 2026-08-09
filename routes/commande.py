@@ -3,13 +3,13 @@ from flask_login import login_required, current_user
 from models import Order, Product, OrderItem
 from extensions import db
 import io
+from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 commande_bp = Blueprint('commande', __name__, url_prefix='/commande')
-
 
 # 1. ROUTE POUR PASSER UNE COMMANDE DEPUIS LE MENU
 @commande_bp.route('/commander/<int:product_id>', methods=['GET', 'POST'])
@@ -97,7 +97,7 @@ def telecharger_recu(order_id):
     # Détails du Client et de la Commande
     elements.append(Paragraph("<b>REÇU DE COMMANDE OFFICIEL</b>", styles['Heading2']))
     elements.append(Paragraph(f"<b>Code Unique :</b> <font color='#d97706'>{commande.code_recu}</font>", styles['Normal']))
-    elements.append(Paragraph(f"<b>Date :</b> {commande.created_at.strftime('%d/%m/%Y à %H:%M') if commande.created_at else 'Récemment'}", styles['Normal']))
+    elements.append(Paragraph(f"<b>Date :</b> {commande.created_at.strftime('%d/%m/%Y à %H:%M') if commande.created_at else datetime.now().strftime('%d/%m/%Y à %H:%M')}", styles['Normal']))
     elements.append(Paragraph(f"<b>Client :</b> {current_user.nom if hasattr(current_user, 'nom') else current_user.email}", styles['Normal']))
     elements.append(Paragraph(f"<b>Téléphone :</b> {commande.telephone}", styles['Normal']))
     elements.append(Paragraph(f"<b>Adresse de livraison :</b> {commande.adresse_livraison}", styles['Normal']))
@@ -131,3 +131,27 @@ def telecharger_recu(order_id):
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'inline; filename=Recu_{commande.code_recu}.pdf'
     return response
+
+
+# 4. SUPPRIMER UNE COMMANDE DE L'HISTORIQUE
+@commande_bp.route('/<int:order_id>/supprimer', methods=['POST'])
+@login_required
+def supprimer_commande(order_id):
+    commande = db.session.get(Order, order_id)
+    
+    if not commande or commande.user_id != current_user.id:
+        flash("Commande introuvable ou accès non autorisé.", "danger")
+        return redirect(url_for('commande.mes_commandes'))
+
+    try:
+        OrderItem.query.filter_by(order_id=commande.id).delete()
+        db.session.delete(commande)
+        db.session.commit()
+        
+        flash("La commande a été supprimée de votre historique.", "success")
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERREUR SUPPRESSION COMMANDE] : {e}")
+        flash("Une erreur s'est produite lors de la suppression.", "danger")
+
+    return redirect(url_for('commande.mes_commandes'))

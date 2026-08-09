@@ -5,245 +5,223 @@
 {% block content %}
 <style>
     :root {
-        --wa-gold: #F59E0B;
-        --wa-dark: #0B0F19;
+        --primary-orange: #F59E0B;
+        --dark-bg: #111827;
+        --card-bg: #FFFFFF;
+        --text-main: #1F2937;
+        --text-muted: #6B7280;
     }
 
-    /* --- SECTION MENU STYLE TV BOARD & BRIQUES --- */
-    .menu-tv-section {
+    /* Style global de la page menu */
+    .wa-menu-section {
+        background-color: #F9FAFB;
+        padding: 2.5rem 0 4rem 0;
+        min-height: 85vh;
+    }
+
+    /* En-tête style application pro */
+    .menu-banner {
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #1F2937 100%);
+        border-radius: 24px;
+        color: white;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         position: relative;
-        min-height: 90vh;
-        background: radial-gradient(circle at center, rgba(20, 24, 33, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%),
-                    url("{{ url_for('static', filename='images/hero_bg.png') }}") no-repeat center center;
-        background-size: cover;
-        padding: 3rem 0.5rem;
-        color: #ffffff;
-    }
-
-    /* Le cadre "TV Board" central */
-    .tv-board-frame {
-        background: #111827;
-        border: 3px solid #1F2937;
-        border-radius: 16px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.15);
         overflow: hidden;
-        max-width: 1300px;
-        margin: 0 auto;
     }
 
-    /* En-tête du Board */
-    .tv-board-header {
-        background: #0f172a;
-        border-bottom: 2px solid #1F2937;
-        padding: 1.5rem 1rem;
-        text-align: center;
+    .menu-banner h1 {
+        font-weight: 800;
+        letter-spacing: -0.5px;
     }
 
-    /* Grille style colonnes TV responsive */
-    .tv-columns-grid {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(240px, 1fr));
-        gap: 0;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Chaque colonne du menu */
-    .tv-column {
+    /* Style des cartes produits (Inspiré des apps de livraison) */
+    .food-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px solid #E5E7EB;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        padding: 1.8rem 1.2rem;
-        transition: transform 0.3s ease, background-color 0.3s ease;
         position: relative;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
-        scroll-snap-align: start;
-        min-width: 250px;
     }
 
-    .tv-column:last-child {
-        border-right: none;
+    .food-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        border-color: #CBD5E1;
     }
 
-    /* Alternance des blocs bicolores */
-    .tv-column:nth-child(odd) {
-        background-color: #DC2626;
-        color: #ffffff;
-    }
-
-    .tv-column:nth-child(even) {
-        background-color: #F8FAFC;
-        color: #1E293B;
-    }
-
-    /* Typographie des titres */
-    .tv-item-title {
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 900;
-        text-transform: uppercase;
-        font-size: 1.25rem;
-        line-height: 1.2;
-        margin-bottom: 0.5rem;
-    }
-
-    .tv-column:nth-child(odd) .tv-item-title { color: #ffffff; }
-    .tv-column:nth-child(even) .tv-item-title { color: #0F172A; }
-
-    /* Prix */
-    .tv-item-price {
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 800;
-        font-size: 1.4rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .tv-column:nth-child(odd) .tv-item-price { color: #FDE047; }
-    .tv-column:nth-child(even) .tv-item-price { color: #DC2626; }
-
-    /* Image du produit */
-    .tv-item-img-wrapper {
+    /* Image du plat avec effet propre */
+    .food-img-container {
+        height: 190px;
         width: 100%;
-        aspect-ratio: 4 / 3;
-        border-radius: 10px;
+        position: relative;
+        background-color: #F3F4F6;
         overflow: hidden;
-        margin: 0.8rem 0;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        background: #000;
     }
 
-    .tv-item-img-wrapper img {
+    .food-img-container img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.4s ease;
     }
 
-    /* Description */
-    .tv-item-desc {
-        font-size: 0.8rem;
-        line-height: 1.4;
-        opacity: 0.9;
-        margin-bottom: 1.2rem;
+    .food-card:hover .food-img-container img {
+        transform: scale(1.06);
+    }
+
+    /* Badge "Populaire" ou catégorie rapide sur l'image */
+    .food-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(17, 24, 39, 0.85);
+        color: #F59E0B;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        backdrop-filter: blur(4px);
+    }
+
+    /* Corps de la carte */
+    .food-body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
         flex-grow: 1;
     }
 
-    /* Bouton de commande */
-    .btn-tv-order {
-        display: block;
-        width: 100%;
-        padding: 0.7rem;
-        border-radius: 50px;
-        font-weight: bold;
-        text-align: center;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
+    .food-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.4rem;
+    }
+
+    .food-description {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+        flex-grow: 1; /* Aligne le bas de toutes les cartes uniformément */
+    }
+
+    /* Pied de carte (Prix + Bouton d'action) */
+    .food-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid #F3F4F6;
+    }
+
+    .food-price {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #EF4444;
+    }
+
+    .btn-wa-order {
+        background-color: var(--primary-orange);
+        color: white;
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        transition: background-color 0.2s ease, transform 0.1s ease;
         text-decoration: none;
-        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
-    .tv-column:nth-child(odd) .btn-tv-order {
-        background-color: #111827;
-        color: #F59E0B;
-        border: 1px solid rgba(255,255,255,0.2);
+    .btn-wa-order:hover {
+        background-color: #D97706;
+        color: white;
+        transform: scale(1.02);
     }
 
-    .tv-column:nth-child(even) .btn-tv-order {
-        background-color: #DC2626;
-        color: #ffffff;
-    }
-
-    /* --- ADAPTATION MOBILE STRICTE --- */
-    @media (max-width: 992px) {
-        .menu-tv-section {
-            padding: 1.5rem 0.2rem;
-        }
-        .tv-board-frame {
-            border-radius: 10px;
-            border-width: 2px;
-        }
-        .tv-board-header {
-            padding: 1rem 0.5rem;
-        }
-        .tv-board-header h1 {
-            font-size: 1.35rem !important;
-        }
-        .tv-columns-grid {
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 15px;
-            padding: 1rem;
-        }
-        .tv-column {
-            border-radius: 12px;
-            border-right: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-    }
-
-    .cbfw-signature {
-        font-family: 'Courier New', Courier, monospace;
-        letter-spacing: 1px;
-        opacity: 0.85;
+    /* Ajustements pour téléphones (zéro bug d'affichage) */
+    @media (max-width: 768px) {
+        .wa-menu-section { padding: 1rem 0; }
+        .menu-banner { padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 16px; }
+        .food-img-container { height: 150px; }
+        .food-body { padding: 1rem; }
+        .food-title { font-size: 1rem; }
+        .food-description { font-size: 0.8rem; margin-bottom: 0.8rem; }
+        .food-price { font-size: 1rem; }
     }
 </style>
 
-<!-- ================= SECTION MENU TV BOARD ================= -->
-<section class="menu-tv-section">
-    <div class="container-fluid px-1 px-md-4">
+<div class="wa-menu-section">
+    <div class="container">
         
-        <div class="tv-board-frame">
-            
-            <div class="tv-board-header">
-                <span class="text-uppercase fw-bold text-warning small d-block mb-1" style="letter-spacing: 2px;">
-                    Wa Ngoie Live Menu Board
-                </span>
-                <h1 class="fw-bolder text-white mb-0" style="letter-spacing: 1px;">
-                    NOS SPÉCIALITÉS DU JOUR
-                </h1>
-            </div>
-
-            <!-- Grille des colonnes -->
-            <div class="tv-columns-grid">
-                {% for produit in produits %}
-                <div class="tv-column">
-                    <div>
-                        <h3 class="tv-item-title">{{ produit.nom }}</h3>
-                        <div class="tv-item-price">
-                            {{ produit.prix }} <small style="font-size: 0.7em;">FC</small>
-                        </div>
-                    </div>
-
-                    <div class="tv-item-img-wrapper">
-                        <img src="{{ url_for('static', filename=produit.image) }}" alt="{{ produit.nom }}" loading="lazy">
-                    </div>
-
-                    <p class="tv-item-desc">
-                        {{ produit.description }}
-                    </p>
-
-                    <!-- Affichage du bouton de commande uniquement si l'utilisateur n'est PAS admin -->
-                    <div>
-                        {% if not current_user.is_authenticated or not current_user.is_admin %}
-                            <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn-tv-order shadow-sm">
-                                Commander
-                            </a>
-                        {% endif %}
-                    </div>
+        <!-- En-tête de la page -->
+        <div class="menu-banner">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="mb-2 fs-3 fs-lg-2"><i class="fas fa-fire text-warning me-2"></i>Le Menu Officiel</h2>
+                    <p class="text-light opacity-75 mb-0 small">Commandez le meilleur de Wa Ngoie Fast-Food à Kintambo. Frais, rapide et délicieux.</p>
                 </div>
-                {% endfor %}
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="{{ url_for('commande.mes_commandes') }}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill btn-sm">
+                        <i class="fas fa-history me-1"></i> Suivre mes commandes
+                    </a>
+                </div>
             </div>
-
         </div>
 
-    </div>
-</section>
+        <!-- Grille des produits (Responsive et robuste) -->
+        <div class="row g-3 g-lg-4">
+            {% for produit in produits %}
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="food-card">
+                    <!-- Image et Badge -->
+                    <div class="food-img-container">
+                        <span class="food-badge"><i class="fas fa-star me-1 text-warning"></i>Wa Ngoie</span>
+                        <img src="{{ url_for('static', filename=produit.image) }}" alt="{{ produit.nom }}">
+                    </div>
+                    
+                    <!-- Contenu -->
+                    <div class="food-body">
+                        <h5 class="food-title text-truncate">{{ produit.nom }}</h5>
+                        <p class="food-description">
+                            {% if produit.description %}
+                                {{ produit.description[:70] }}{% if produit.description|length > 70 %}...{% endif %}
+                            {% else %}
+                                Préparé avec des ingrédients frais du jour.
+                            {% endif %}
+                        </p>
+                        
+                        <!-- Prix et Bouton de commande -->
+                        <div class="food-footer">
+                            <span class="food-price">{{ "{:,}".format(produit.prix).replace(',', ' ') }} FC</span>
+                            <a href="{{ url_for('commande.commander', product_id=produit.id) }}" class="btn-wa-order">
+                                <i class="fas fa-plus"></i> Commander
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+                    <i class="fas fa-utensils fa-3x text-muted mb-3 opacity-25"></i>
+                    <h5 class="text-dark fw-bold">Aucun plat disponible pour l'instant</h5>
+                    <p class="text-muted small mb-0">Le chef prépare de nouvelles recettes exceptionnelles.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
 
-<!-- ================= SIGNATURE CBFW ================= -->
-<div class="bg-dark text-center py-3 border-top border-secondary border-opacity-25">
-    <div class="container">
-        <p class="mb-0 small text-light cbfw-signature">
-            <span class="text-warning">⚡</span> that shit been doin' by <strong class="text-warning">cbfw</strong>
-        </p>
     </div>
 </div>
 {% endblock %}

@@ -3,61 +3,158 @@
 {% block title %}Mes Commandes - Wa Ngoie{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h2 class="fw-bold mb-4"><i class="fas fa-history text-warning me-2"></i>Historique de mes Commandes</h2>
+<style>
+    :root {
+        --wa-orange: #F59E0B;
+        --wa-bg-light: #FFF9F0;
+    }
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Code Reçu</th>
-                            <th>Date</th>
-                            <th>Adresse</th>
-                            <th>Montant</th>
-                            <th>Statut</th>
-                            <th class="text-center">Action / Reçu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cmd in commandes %}
-                        <tr>
-                            <td class="fw-bold text-warning">{{ cmd.code_recu }}</td>
-                            <td>{{ cmd.created_at.strftime('%d/%m/%Y %H:%M') if cmd.created_at else 'Récemment' }}</td>
-                            <td>{{ cmd.adresse_livraison }}</td>
-                            <td class="fw-bold text-danger">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</td>
-                            <td>
-                                {% if cmd.status == 'En attente' %}
-                                    <span class="badge bg-warning text-dark">En attente</span>
-                                {% elif cmd.status == 'Validée' %}
-                                    <span class="badge bg-info text-dark">Validée</span>
-                                {% elif cmd.status == 'Livrée' %}
-                                    <span class="badge bg-success">Livrée</span>
+    body { background-color: #FDF3E7 !important; }
+
+    .history-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+    }
+
+    .table th {
+        background-color: #1F2937;
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    .item-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .item-list li {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+        color: #4B5563;
+    }
+
+    .time-badge {
+        background-color: #F3F4F6;
+        color: #374151;
+        padding: 0.3rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 0.3rem;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="history-container">
+        <h2 class="fw-bold mb-4" style="color: #1F2937;">
+            <i class="fas fa-history me-2" style="color: var(--wa-orange);"></i>Historique de mes Commandes
+        </h2>
+
+        <div class="table-responsive rounded-3 overflow-hidden">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="py-3">Code / Date</th>
+                        <th class="py-3">Plats Commandés</th>
+                        <th class="py-3">Adresse</th>
+                        <th class="py-3">Montant Total</th>
+                        <th class="py-3">Statut</th>
+                        <th class="py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cmd in commandes %}
+                    <tr>
+                        <!-- Code et Heure -->
+                        <td>
+                            <div class="fw-bold text-warning" style="font-size: 1.1rem; letter-spacing: 1px;">#{{ cmd.code_recu }}</div>
+                            <div class="small text-muted mt-1">{{ cmd.created_at.strftime('%d/%m/%Y') if cmd.created_at else 'Aujourd\'hui' }}</div>
+                            <div class="time-badge">
+                                <i class="far fa-clock me-1 text-warning"></i> {{ cmd.created_at.strftime('%H:%M') if cmd.created_at else '--:--' }}
+                            </div>
+                        </td>
+
+                        <!-- Détail des plats -->
+                        <td>
+                            <ul class="item-list">
+                                <!-- On suppose que la relation vers OrderItem s'appelle 'items' ou 'order_items' dans tes modèles -->
+                                {% for item in cmd.items %}
+                                    <li>
+                                        <span class="fw-bold text-warning">{{ item.quantity }}x</span> 
+                                        <!-- Assure-toi que la relation vers le produit s'appelle 'product' ou adapte ici (ex: item.produit.nom) -->
+                                        {{ item.product.nom if item.product else 'Produit inconnu' }}
+                                    </li>
                                 {% else %}
-                                    <span class="badge bg-secondary">{{ cmd.status }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
+                                    <li class="text-muted fst-italic small">Détails non disponibles</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+
+                        <!-- Adresse -->
+                        <td class="small">{{ cmd.adresse_livraison }}</td>
+
+                        <!-- Montant -->
+                        <td class="fw-bold text-danger fs-5">{{ "{:,}".format(cmd.total_price).replace(',', ' ') }} FC</td>
+
+                        <!-- Statut -->
+                        <td>
+                            {% if cmd.status == 'En attente' %}
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="fas fa-hourglass-half me-1"></i>En attente</span>
+                            {% elif cmd.status == 'Validée' %}
+                                <span class="badge bg-info text-dark px-3 py-2 rounded-pill"><i class="fas fa-check me-1"></i>Validée</span>
+                            {% elif cmd.status == 'Livrée' %}
+                                <span class="badge bg-success px-3 py-2 rounded-pill"><i class="fas fa-box-open me-1"></i>Livrée</span>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2 rounded-pill">{{ cmd.status }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions : Reçu + Suppression -->
+                        <td class="text-center">
+                            <div class="d-flex flex-column align-items-center gap-2">
                                 {% if cmd.status in ['Validée', 'Livrée'] %}
-                                    <a href="{{ url_for('commande.telecharger_recu', order_id=cmd.id) }}" target="_blank" class="btn btn-sm btn-danger fw-bold shadow-sm">
-                                        <i class="fas fa-file-pdf me-1"></i> Imprimer Reçu
+                                    <a href="{{ url_for('commande.telecharger_recu', order_id=cmd.id) }}" target="_blank" class="btn btn-sm btn-dark w-100 fw-bold shadow-sm rounded-3">
+                                        <i class="fas fa-file-pdf text-danger"></i> Reçu
                                     </a>
                                 {% else %}
-                                    <span class="badge bg-light text-muted border py-2 px-3" title="Attendez que l'admin valide votre commande">
-                                        <i class="fas fa-lock me-1"></i> En attente de validation
+                                    <span class="badge bg-light text-muted border py-2 w-100" title="Attendez la validation pour le reçu" style="font-size: 0.75rem;">
+                                        <i class="fas fa-lock me-1"></i> Patientez...
                                     </span>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Vous n'avez passé aucune commande pour le moment.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+
+                                <!-- Formulaire pour supprimer la commande -->
+                                <form action="{{ url_for('commande.supprimer_commande', order_id=cmd.id) }}" method="POST" class="w-100" onsubmit="return confirm('Es-tu sûr de vouloir supprimer cette commande de ton historique ?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100 rounded-3">
+                                        <i class="fas fa-trash-alt me-1"></i> Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fas fa-utensils fa-3x text-muted mb-3 opacity-25"></i>
+                            <h5 class="text-muted">Votre historique est vide</h5>
+                            <p class="text-muted small mb-0">Vous n'avez passé aucune commande pour le moment.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
